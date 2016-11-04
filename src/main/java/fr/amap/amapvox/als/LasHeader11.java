@@ -20,7 +20,7 @@ package fr.amap.amapvox.als;
 
 /**
  * Represents the structure of a las file header version 1.1
- * @author calcul
+ * @author Julien Heurtebize (julienhtbe@gmail.com)
  */
 
 public class LasHeader11 extends LasHeader {

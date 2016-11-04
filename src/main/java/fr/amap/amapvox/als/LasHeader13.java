@@ -22,7 +22,7 @@ import java.math.BigInteger;
 
 /**
  * Represents the structure of a las file header version 1.3
- * @author calcul
+ * @author Julien Heurtebize (julienhtbe@gmail.com)
  */
 
 public class LasHeader13 extends LasHeader12 {
