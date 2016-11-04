@@ -24,7 +24,6 @@ import fr.amap.commons.util.NativeLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import org.apache.log4j.Logger;
 
 /**
  * This class is devoted to read a LASzip file (*.laz), it allows to get the header, <br>
@@ -36,8 +35,6 @@ import org.apache.log4j.Logger;
 public class LazExtraction implements Iterable<LasPoint>{
     
     private final static String NATIVE_LIBRARY_NAME = "LasZipLibrary";
-    
-    private final static Logger logger = Logger.getLogger(LazExtraction.class);
     
     private native void afficherBonjour();
     private native long instantiateLasZip();
@@ -63,7 +60,7 @@ public class LazExtraction implements Iterable<LasPoint>{
         try {
             loader.loadLibrary(NATIVE_LIBRARY_NAME, LazExtraction.class);
         } catch (IOException ex) {
-            logger.error("Cannot load "+NATIVE_LIBRARY_NAME+" library", ex);
+            System.err.println("Cannot load "+NATIVE_LIBRARY_NAME+" library, cause : " + ex.getMessage());
         }
         
     }
@@ -89,7 +86,6 @@ public class LazExtraction implements Iterable<LasPoint>{
             case -1:
                 throw new IOException("Laz file "+file.getAbsolutePath()+" cannot be open");
             case 0:
-                logger.info("Laz file "+file.getAbsolutePath()+" is opened");
                 break;
 
             default:
@@ -113,7 +109,6 @@ public class LazExtraction implements Iterable<LasPoint>{
      */
     public void close(){
         deleteLasZip(lasZipPointer);
-        logger.info("Laz file is closed");
     }
 
     /**
