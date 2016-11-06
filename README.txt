@@ -14,7 +14,7 @@ Laz reader features:
 
 	-Read las format until 1.4
 	-Read las point format until format 1.0
-	-Read las point attributes : x, y, z, echo range, echo number, echo 	recording time, echo intensity, echo classification
+	-Read las point attributes : x, y, z, echo range, echo number, echo recording time, echo intensity, echo classification
 
 You cannot :
 	-Write laz file
