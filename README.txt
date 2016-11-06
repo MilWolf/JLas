@@ -16,7 +16,7 @@ Laz reader features:
 	-Read las point format until format 1.0
 	-Read las point attributes : x, y, z, echo range, echo number, echo recording time, echo intensity, echo classification
 
-You cannot :
-	-Write laz file
-	-Read other attributes than x, y, z, echo range, echo number, echo recording time, echo intensity, echo classification
-	-Use this library with 32 bits JVM, and other systems than Windows and Linux.
+	You cannot :
+		-Write laz file
+		-Read other attributes than x, y, z, echo range, echo number, echo recording time, echo intensity, echo classification
+		-Use this library with 32 bits JVM, and other systems than Windows and Linux.

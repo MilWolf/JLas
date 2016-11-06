@@ -22,8 +22,9 @@ import fr.amap.commons.util.ByteConverter;
 
 
 /**
- * Represents the structure of a las point, with the following basics informations:<br>
- * x, y, z, echo range, echo number, recorded time (gps), intensity, classification
+ * Represents the structure of a las point, with the following basics informations:
+ * x, y, z, echo range, echo number, recorded time (gps), intensity, classification.
+ * <p>Warning : This class is used by the native library and should not be moved to another package.</p>
  * @author Julien Heurtebize (julienhtbe@gmail.com)
  */
 public class LasPoint implements Comparable<LasPoint>{
