@@ -37,8 +37,7 @@ import java.util.logging.Logger;
 
 /**
  * This class is devoted to read a LASer (*.las) file.
- * It allows to get the header in a simple basic format (V1.0) and get an iterator on the points of the file.<br>
- * It uses a native library compiled for 64 bits systems, Linux and Windows.<br><br>
+ * It allows to get the file header and get an iterator on the points of the file.<br><br><br>
  * 
  * @see <a href="http://www.asprs.org/Committee-General/LASer-LAS-File-Format-Exchange-Activities.html">ASPRS Specification</a>
  * 
@@ -51,10 +50,20 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
     private ArrayList<VariableLengthRecord> variableLengthRecords;
     private LasHeader header;
 
+    /**
+     * Get a list of the variable length records.
+     * @see <a href="http://www.asprs.org/Committee-General/LASer-LAS-File-Format-Exchange-Activities.html">ASPRS Specification</a>
+     * @return A list of variable length records.
+     */
     public ArrayList<VariableLengthRecord> getVariableLengthRecords() {
         return variableLengthRecords;
     }
 
+    /**
+     * Get the las file header.
+     * <p>Before, a call to the method {@link #open(java.io.File) } is required.</p>
+     * @return The las header.
+     */
     public LasHeader getHeader() {
         return header;
     }
@@ -626,6 +635,13 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
         return header;
     }
 
+    /**
+     * Read the header of the given las file.
+     * @param file a las file
+     * @return The header of the las file.
+     * @throws IOException
+     * @throws UnsupportedOperationException 
+     */
     public LasHeader readHeader(File file) throws IOException, UnsupportedOperationException {
 
         try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
@@ -680,7 +696,7 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
 
     }
 
-    public static ArrayList<VariableLengthRecord> readVariableLengthRecords(File file, int start, long end, long variableNumber) throws IOException {
+    private static ArrayList<VariableLengthRecord> readVariableLengthRecords(File file, int start, long end, long variableNumber) throws IOException {
 
         ArrayList<VariableLengthRecord> variableLengthRecords = new ArrayList<>();
 
@@ -735,6 +751,12 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
         return variableLengthRecords;
     }
     
+    /**
+     * Open the given las file, read its header and the variable length records.
+     * @param file a las file
+     * @throws IOException
+     * @throws Exception 
+     */
     public void open(File file) throws IOException, Exception{
         
         LasReader reader = new LasReader();
@@ -744,6 +766,11 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
     }
     
 
+    /**
+     * Iterates through the points of the las file. 
+     * Points are not kept in memory.
+     * @return 
+     */
     @Override
     public Iterator<PointDataRecordFormat> iterator(){
 
@@ -945,235 +972,4 @@ public class LasReader implements Iterable<PointDataRecordFormat> {
         }
         return it;
     }
-
-    public static ArrayList<PointDataRecordFormat> readPointDataRecords(File file, long start, short offset, long pointNumber, int pointFormatID) throws NumberFormatException, IOException {
-
-        ArrayList<PointDataRecordFormat> pointDataRecords = new ArrayList<>();
-
-        try {
-
-            DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-            PointDataRecordFormat pdr = null;
-
-            dis.skip(start);
-
-            for (long i = 0; i < pointNumber; i++) {
-
-                switch (pointFormatID) {
-
-                    case 0:
-                        pdr = new PointDataRecordFormat();
-                        break;
-                    case 1:
-                        pdr = new PointDataRecordFormat1();
-                        break;
-                    case 2:
-                        pdr = new PointDataRecordFormat2();
-                        break;
-                    case 3:
-                        pdr = new PointDataRecordFormat3();
-                        break;
-                }
-
-                int x = LittleEndianUtility.bytesToInt(dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte());
-                pdr.setX(x);
-
-                int y = LittleEndianUtility.bytesToInt(dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte());
-                pdr.setY(y);
-
-                int z = LittleEndianUtility.bytesToInt(dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte());
-                pdr.setZ(z);
-
-                int intensity = LittleEndianUtility.bytesToShortInt(dis.readByte(), dis.readByte());
-                pdr.setIntensity(intensity);
-
-                byte b = dis.readByte();
-
-                int bit0 = (b >> 0) & 1;
-                int bit1 = (b >> 1) & 1;
-                int bit2 = (b >> 2) & 1;
-                int bit3 = (b >> 3) & 1;
-                int bit4 = (b >> 4) & 1;
-                int bit5 = (b >> 5) & 1;
-                int bit6 = (b >> 6) & 1;
-                int bit7 = (b >> 7) & 1;
-
-                int returnNumber = Integer.parseInt(String.valueOf(bit2) + String.valueOf(bit1) + String.valueOf(bit0), 2);
-                pdr.setReturnNumber((short) returnNumber);
-
-                int numberOfReturns = Integer.parseInt(String.valueOf(bit5) + String.valueOf(bit4) + String.valueOf(bit3), 2);
-                pdr.setNumberOfReturns((short) numberOfReturns);
-
-                if (bit6 == 0) {
-                    pdr.setScanDirectionFlag(false);
-                } else {
-                    pdr.setScanDirectionFlag(true);
-                }
-
-                if (bit7 == 0) {
-                    pdr.setEdgeOfFlightLine(false);
-                } else {
-                    pdr.setEdgeOfFlightLine(true);
-                }
-
-                b = dis.readByte();
-
-                /*classification bits*/
-                bit0 = (b >> 0) & 1;
-                bit1 = (b >> 1) & 1;
-                bit2 = (b >> 2) & 1;
-                bit3 = (b >> 3) & 1;
-                bit4 = (b >> 4) & 1;
-
-                /*synthetic*/
-                bit5 = (b >> 5) & 1;
-
-                /*key-point*/
-                bit6 = (b >> 6) & 1;
-
-                /*Withheld*/
-                bit7 = (b >> 7) & 1;
-
-                short classification = (short) Integer.parseInt(
-                        String.valueOf(bit4)
-                        + String.valueOf(bit3)
-                        + String.valueOf(bit2)
-                        + String.valueOf(bit1)
-                        + String.valueOf(bit0), 2);
-
-                pdr.setClassification(classification);
-
-                boolean synthetic = (bit5 != 0);
-                pdr.setSynthetic(synthetic);
-
-                boolean keyPoint = (bit6 != 0);
-                pdr.setKeyPoint(keyPoint);
-
-                boolean withheld = (bit7 != 0);
-                pdr.setWithheld(withheld);
-
-                int sar = dis.readByte();
-                pdr.setScanAngleRank(sar);
-
-                int usrData = dis.readUnsignedByte();
-                pdr.setUserData(usrData);
-
-                int pointSrcID = dis.readByte() + dis.readByte();
-                pdr.setPointSourceID(pointSrcID);
-
-                double gpsTime;
-                int red, green, blue;
-
-                short length = 0;
-                short difference = 0;
-
-                switch (pointFormatID) {
-
-                    case 1:
-                        gpsTime = LittleEndianUtility.toDouble(dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte(),
-                                dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte());
-                        ((PointDataRecordFormat1) pdr).setGpsTime(gpsTime);
-
-                        length = PointDataRecordFormat1.LENGTH;
-
-                        break;
-
-                    case 2:
-                        red = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat2) pdr).setRed(red);
-                        green = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat2) pdr).setGreen(green);
-                        blue = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat2) pdr).setBlue(blue);
-
-                        length = PointDataRecordFormat2.LENGTH;
-
-                        break;
-                    case 3:
-                        gpsTime = LittleEndianUtility.toDouble(dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte(),
-                                dis.readByte(), dis.readByte(), dis.readByte(), dis.readByte());
-                        ((PointDataRecordFormat3) pdr).setGpsTime(gpsTime);
-                        red = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat3) pdr).setRed(red);
-                        green = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat3) pdr).setGreen(green);
-                        blue = dis.readByte() + dis.readByte();
-                        ((PointDataRecordFormat3) pdr).setBlue(blue);
-
-                        length = PointDataRecordFormat3.LENGTH;
-
-                        break;
-                }
-
-                difference = (short) (offset - length);
-
-                if (difference != 0) {
-
-                    byte[] bytes = new byte[difference];
-
-                    for (short j = 0; j < difference; j++) {
-
-                        bytes[j] = dis.readByte();
-                    }
-                    switch (difference) {
-                        case 2:
-                            pdr.setExtrabytes((Extrabytes) new QLineExtrabytes(bytes));
-                            break;
-                        case 3:
-                            pdr.setExtrabytes((Extrabytes) new VLineExtrabytes(bytes));
-                            break;
-                    }
-                }
-
-                pointDataRecords.add(pdr);
-            }
-
-        } catch (IOException | NumberFormatException ex) {
-            throw ex;
-        }
-
-        return pointDataRecords;
-    }
-
-    public static void writeTxt(Las las) {
-
-    }
-    
-    public static Las read(File file) throws IOException, Exception {
-
-        LasReader reader = new LasReader();
-        LasHeader header = reader.readHeader(file);
-        ArrayList<VariableLengthRecord> variableLengthRecords = readVariableLengthRecords(file, header.getHeaderSize(), header.getOffsetToPointData(), header.getNumberOfVariableLengthRecords());
-        ArrayList<PointDataRecordFormat> pointDataRecords = readPointDataRecords(file, header.getOffsetToPointData(), header.getPointDataRecordLength(), header.getNumberOfPointrecords(), header.getPointDataFormatID());
-
-        Las las = new Las(header, variableLengthRecords, pointDataRecords);
-
-        return las;
-    }
-
-    
-
-    private static byte[] getBin(int decimal) {
-
-        byte[] result = new byte[8];
-
-        for (int i = 0; i < 8; i++) {
-
-            if (decimal - Math.pow(2, 7 - i) > 0) {
-
-                result[i] = 1;
-                decimal -= Math.pow(2, 7 - i);
-
-            } else if (decimal - Math.pow(2, 7 - i) == 0) {
-
-                result[i] = 1;
-                break;
-
-            }
-        }
-
-        return result;
-
-    }
-
 }

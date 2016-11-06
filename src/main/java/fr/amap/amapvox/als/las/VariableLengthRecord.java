@@ -49,6 +49,24 @@ public class VariableLengthRecord {
     public void setDescription(char[] description) {
         this.description = String.valueOf(description);
     }
-    
-    
+
+    public int getReserved() {
+        return reserved;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public int getRecordID() {
+        return recordID;
+    }
+
+    public int getRecordLengthAfterHeader() {
+        return recordLengthAfterHeader;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

@@ -119,6 +119,11 @@ public class LazExtraction implements Iterable<LasPoint>{
         return header;
     }
 
+    /**
+     * Iterates through the points of the las file. 
+     * Points are not kept in memory.
+     * @return 
+     */
     @Override
     public Iterator<LasPoint> iterator() {
         
