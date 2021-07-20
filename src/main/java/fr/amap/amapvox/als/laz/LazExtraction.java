@@ -20,7 +20,7 @@ package fr.amap.amapvox.als.laz;
 
 import fr.amap.amapvox.als.LasHeader;
 import fr.amap.amapvox.als.LasPoint;
-import fr.amap.commons.util.NativeLoader;
+import fr.amap.amapvox.util.NativeLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;

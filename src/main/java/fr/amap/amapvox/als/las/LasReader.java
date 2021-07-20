@@ -22,7 +22,7 @@ import fr.amap.amapvox.als.LasHeader;
 import fr.amap.amapvox.als.LasHeader11;
 import fr.amap.amapvox.als.LasHeader12;
 import fr.amap.amapvox.als.LasHeader13;
-import fr.amap.commons.util.io.LittleEndianUtility;
+import fr.amap.amapvox.util.LittleEndianUtility;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
